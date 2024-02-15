@@ -15,9 +15,9 @@
 #
 # add -DUSE_READLINE	To compile in support for the GNU readline library.
 
-CFLAGS= -g -O2 -std=c89 
+CFLAGS= -g -O2 -std=c89 -DDOS
 # CFLAGS+= -Ddodebug=1
-CC= gcc
+CC= x86_64-w64-mingw32-gcc
 LIBS= 
 ALLFILES= Makefile cdgram.y cdlex.l cdecl.c cdecl.1 testset.txt testset_expected_output.txt testset_cpp_expected_output.txt
 BINDIR= /usr/bin
@@ -28,14 +28,14 @@ INSTALL_DATA= install -c -m 644
 
 EMCC_OPTIONS= -sEXPORTED_FUNCTIONS=_run_from_js -sEXPORTED_RUNTIME_METHODS=ccall,cwrap -sENVIRONMENT=web -sWASM=0 -sINVOKE_RUN=0 -sMALLOC=emmalloc 
 
-cdecl: c++decl
-	ln -s c++decl cdecl
+cdecl.exe: c++decl.exe
+	cp c++decl.exe cdecl.exe
 
 cdecl.js:  cdgram.c cdlex.c cdecl.c
 	emcc -std=c89 $(EMCC_OPTIONS) -Oz -Wno-deprecated-non-prototype cdecl.c -o cdecl.js
 
-c++decl: cdgram.c cdlex.c cdecl.c
-	$(CC) $(CFLAGS) -o c++decl cdecl.c $(LIBS)
+c++decl.exe: cdgram.c cdlex.c cdecl.c
+	$(CC) $(CFLAGS) -o c++decl.exe cdecl.c $(LIBS)
 	rm -f cdecl
 
 cdlex.c: cdlex.l
@@ -59,7 +59,7 @@ install: cdecl
 	$(INSTALL_DATA) c++decl.1 $(MANDIR)
 
 clean:
-	rm -f cdgram.c cdlex.c cdecl y.output c++decl cdecl.js cdecl.js.mem cdecl.wasm
+	rm -f cdgram.c cdlex.c cdecl.exe y.output c++decl.exe cdecl.js cdecl.js.mem cdecl.wasm
 
 clobber: clean
 	rm -f $(BINDIR)/cdecl $(BINDIR)/c++decl
